@@ -354,25 +354,28 @@ impl Chip8 {
     }
 
     pub fn set_keys(&mut self, window: &Window) {
-        // CHIP-8 keypad mapping to keyboard
-        self.keypad[0x1] = window.is_key_down(Key::Key1);
-        self.keypad[0x2] = window.is_key_down(Key::Key2);
-        self.keypad[0x3] = window.is_key_down(Key::Key3);
-        self.keypad[0xC] = window.is_key_down(Key::Key4);
+        // Reset all keys
+        self.keypad.fill(false);
         
-        self.keypad[0x4] = window.is_key_down(Key::Q);
-        self.keypad[0x5] = window.is_key_down(Key::W);
-        self.keypad[0x6] = window.is_key_down(Key::E);
-        self.keypad[0xD] = window.is_key_down(Key::R);
+        // Map keyboard to CHIP-8 keypad
+        if window.is_key_down(Key::Key1) { self.keypad[0x1] = true; }
+        if window.is_key_down(Key::Key2) { self.keypad[0x2] = true; }
+        if window.is_key_down(Key::Key3) { self.keypad[0x3] = true; }
+        if window.is_key_down(Key::Key4) { self.keypad[0xC] = true; }
         
-        self.keypad[0x7] = window.is_key_down(Key::A);
-        self.keypad[0x8] = window.is_key_down(Key::S);
-        self.keypad[0x9] = window.is_key_down(Key::D);
-        self.keypad[0xE] = window.is_key_down(Key::F);
+        if window.is_key_down(Key::Q) { self.keypad[0x4] = true; }
+        if window.is_key_down(Key::W) { self.keypad[0x5] = true; }
+        if window.is_key_down(Key::E) { self.keypad[0x6] = true; }
+        if window.is_key_down(Key::R) { self.keypad[0xD] = true; }
         
-        self.keypad[0xA] = window.is_key_down(Key::Z);
-        self.keypad[0x0] = window.is_key_down(Key::X);
-        self.keypad[0xB] = window.is_key_down(Key::C);
-        self.keypad[0xF] = window.is_key_down(Key::V);
+        if window.is_key_down(Key::A) { self.keypad[0x7] = true; }
+        if window.is_key_down(Key::S) { self.keypad[0x8] = true; }
+        if window.is_key_down(Key::D) { self.keypad[0x9] = true; }
+        if window.is_key_down(Key::F) { self.keypad[0xE] = true; }
+        
+        if window.is_key_down(Key::Z) { self.keypad[0xA] = true; }
+        if window.is_key_down(Key::X) { self.keypad[0x0] = true; }
+        if window.is_key_down(Key::C) { self.keypad[0xB] = true; }
+        if window.is_key_down(Key::V) { self.keypad[0xF] = true; }
     }
 }

@@ -22,7 +22,7 @@ fn main() {
         WindowOptions::default()
     ).unwrap_or_else(|e| panic!("Window error: {}", e));
 
-    window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
+    window.limit_update_rate(Some(std::time::Duration::from_millis(16))); // ~60 FPS
 
     let rom = load_rom_file("roms/Space_Invaders.ch8");
     let mut chip8 = Chip8::new();
@@ -35,25 +35,32 @@ fn main() {
         chip8.emulate_cycle();
 
         if chip8.draw_flag {
-            for y in 0..HEIGHT {
-                for x in 0..WIDTH {
-                    let pixel = if chip8.gfx[y * WIDTH + x] != 0 { 0xFFFFFF } else { 0x000000 };
-
-                    for sy in 0..SCALE {
-                        for sx in 0..SCALE {
-                            let scaled_x = x * SCALE + sx;
-                            let scaled_y = y * SCALE + sy;
-                            let index = scaled_y * display_width + scaled_x;
-
-                            if index < buffer.len() {
-                                buffer[index] = pixel;
-                            }
-                        }
+            // Pre-calculate colors
+            const WHITE: u32 = 0xFFFFFF;
+            const BLACK: u32 = 0x000000;
+            
+            for (i, &pixel) in chip8.gfx.iter().enumerate() {
+                let color = if pixel != 0 { WHITE } else { BLACK };
+                let chip8_x = i % WIDTH;
+                let chip8_y = i / WIDTH;
+                
+                // Calculate base position in scaled buffer
+                let base_x = chip8_x * SCALE;
+                let base_y = chip8_y * SCALE;
+                let base_index = base_y * display_width + base_x;
+                
+                // Fill SCALE x SCALE block efficiently
+                for dy in 0..SCALE {
+                    let row_start = base_index + dy * display_width;
+                    let row_end = row_start + SCALE;
+                    if row_end <= buffer.len() {
+                        buffer[row_start..row_end].fill(color);
                     }
                 }
             }
             chip8.draw_flag = false;
         }
+
 
         window.update_with_buffer(&buffer, display_width, display_height).unwrap();
     }
